@@ -20,7 +20,11 @@ body{
 }
 
 .app__left{
-  flex: 0.9
+  flex: 0.9;
+}
+
+.app__right{
+  padding:20px;
 }
 
 .app__stats{
