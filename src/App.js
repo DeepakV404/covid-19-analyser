@@ -4,8 +4,9 @@ import Map from "./Map"
 import Infobox from "./Infobox";
 import Table from "./Table";  
 import LineGraph from "./LineGraph";
+import numeral from "numeral";
 import './App.css';
-import { sortData } from "./utils";
+import { sortData, prettyPrintStat } from "./utils";
 import "leaflet/dist/leaflet.css";
 
 
@@ -87,9 +88,29 @@ function App() {
           </FormControl>
         </div>
         <div className="app__stats">
-              <Infobox title="Covid-19 Cases" cases={countryInfo.todayCases} total={countryInfo.cases}/>
-              <Infobox title="Recovered" cases={countryInfo.todayRecovered} total={countryInfo.recovered}/>
-              <Infobox title="Total" cases={countryInfo.todayDeaths} total={countryInfo.deaths}/>
+              <Infobox 
+                title="Covid-19 Cases"
+                isRed
+                active={casesType === "cases"} 
+                onClick={(e) => setCasesType("cases")}
+                cases={prettyPrintStat(countryInfo.todayCases)} 
+                total={numeral(countryInfo.cases).format("0.0a")}
+              />
+              <Infobox 
+                title="Recovered" 
+                active={casesType === "recovered"}
+                onClick={(e) => setCasesType("recovered")}
+                cases={prettyPrintStat(countryInfo.todayRecovered)} 
+                total={numeral(countryInfo.recovered).format("0.0a")}
+              />
+              <Infobox 
+                title="Total" 
+                isRed
+                active={casesType === "deaths"}
+                onClick={(e) => setCasesType("deaths")}
+                cases={prettyPrintStat(countryInfo.todayDeaths)} 
+                total={numeral(countryInfo.deaths).format("0.0a")}
+              />
         </div>
         <Map 
               countries={mapCountries}
@@ -101,9 +122,9 @@ function App() {
         
       <Card className="app__right">
             <h2>World wide total cases</h2>
-            <Table countries={tableData}/>
-            <h2>World wide total cases graph</h2>
-            <LineGraph />
+            <Table countries={tableData}/><br/><br/>
+            <h2>World wide total {casesType}</h2><br/>
+            <LineGraph className="app__graph" casesType={casesType} />
         </Card>
       
     </div>
