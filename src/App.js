@@ -6,6 +6,7 @@ import Table from "./Table";
 import LineGraph from "./LineGraph";
 import './App.css';
 import { sortData } from "./utils";
+import "leaflet/dist/leaflet.css";
 
 
 function App() {
@@ -15,6 +16,9 @@ function App() {
   const [countryInfo, setCountryInfo] = useState({});
   const [tableData, setTableData] = useState([]);
   const [casesType, setCasesType] = useState("cases");
+  const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796});
+  const [mapZoom, setMapZoom] = useState(3);
+  const [mapCountries, setMapCountries] = useState([]);
 
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
@@ -38,6 +42,7 @@ function App() {
             
             const sortedData = sortData(data);
             setTableData(sortedData);
+            setMapCountries(data)
             setCountries(countries);
 
         });
@@ -47,7 +52,7 @@ function App() {
 
   const onCountryChange = async(event) => {
     const countryCode = event.target.value
-    setCountry(countryCode);
+    //setCountry(countryCode);
 
     const url = countryCode === "worldwide" 
       ? "https://disease.sh/v3/covid-19/all" 
@@ -58,6 +63,10 @@ function App() {
         .then(data => {
             setCountry(countryCode);
             setCountryInfo(data);
+
+            setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+            setMapZoom(4);
+
         });
   };
   // console.log("CountryInfo",countryInfo)
@@ -82,14 +91,20 @@ function App() {
               <Infobox title="Recovered" cases={countryInfo.todayRecovered} total={countryInfo.recovered}/>
               <Infobox title="Total" cases={countryInfo.todayDeaths} total={countryInfo.deaths}/>
         </div>
-        <Map/>
+        <Map 
+              countries={mapCountries}
+              casesType={casesType}
+              center={mapCenter}
+              zoom={mapZoom}
+        />
       </div>
+        
       <Card className="app__right">
-          <h2>World wide total cases</h2>
-          <Table countries={tableData}/>
-          <h2>World wide total cases graph</h2>
-          <LineGraph />
-      </Card>
+            <h2>World wide total cases</h2>
+            <Table countries={tableData}/>
+            <h2>World wide total cases graph</h2>
+            <LineGraph />
+        </Card>
       
     </div>
   );
